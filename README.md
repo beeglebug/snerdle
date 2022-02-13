@@ -1,2 +1,2 @@
 # snerdle
-the stupidest idea i ever had
+a thoroughly stupid idea
