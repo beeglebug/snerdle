@@ -35,11 +35,13 @@ elRestart.addEventListener("click", restart);
 
 function lose() {
   running = false;
+  gtag("event", "lose");
   showStats("Game Over");
 }
 
 function win() {
   running = false;
+  gtag("event", "win");
   showStats("Well Done");
 }
 
@@ -151,7 +153,11 @@ function tick(time = 0) {
   lastTime = time;
 }
 
-function restart() {
+function restart(first = false) {
+  if (first === false) {
+    gtag("event", "restart");
+  }
+
   elements.forEach((el) => (el.innerHTML = ""));
 
   for (let i = 0; i < 26; i++) {
@@ -182,4 +188,4 @@ function restart() {
   tick();
 }
 
-restart();
+restart(true);
