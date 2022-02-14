@@ -92,7 +92,6 @@ function eat(letter, x, y) {
   const { tail } = snake;
   const type = "unknown";
   tail.unshift({ letter, x, y, type });
-  speed -= SPEED_INCREMENT;
 
   if (tail.length % 5 === 0) {
     const letters = tail.slice(0, 5);
@@ -105,6 +104,8 @@ function eat(letter, x, y) {
 }
 
 function guess(word) {
+  speed -= SPEED_INCREMENT;
+
   if (word === answer) {
     win();
     return;
