@@ -3,15 +3,24 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>My First Parcel App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
+  <title>Snerdle - Snake + Wordle</title>
   <link rel="stylesheet" href="styles.css" />
   <script type="module" src="index.js"></script>
 </head>
 
 <body>
   <div class="game">
-    <div class="grid">
+    <div class="grid"></div>
+  </div>
+  <div class="modal-container d-none">
+    <div class="modal">
+      <h3 class="js-title">[title]</h3>
+      <p>The word was <strong class="js-answer">[answer]</strong>.</p>
+      <p class="js-stats">[stats]</p>
+      <button class="js-restart">Play Again</button>
     </div>
+  </div>
 </body>
 
 </html>

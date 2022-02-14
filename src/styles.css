@@ -48,6 +48,12 @@ body {
   height: 30px;
 }
 
+.head {
+  color: #45a329;
+  background-color: #2f5324;
+  font-size: 1.75em;
+}
+
 .unknown {
   background-color: #787878;
   color: #171717;
@@ -68,4 +74,48 @@ body {
 
 .bad {
   background-color: #c62727;
+}
+
+.modal-container {
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  padding: 2em;
+  border: 1px solid #666;
+  background-color: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal button {
+  width: 100%;
+  border: none;
+  background-color: #fff;
+  padding: 1em;
+}
+
+.modal p {
+  margin: 0 0 2em 0;
+}
+
+.modal h3 {
+  margin: 0 0 1em 0;
+}
+
+.modal strong {
+  text-transform: uppercase;
+}
+
+.d-none {
+  display: none;
 }

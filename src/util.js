@@ -22,3 +22,14 @@ export function calculateState(word, answer) {
 
   return state;
 }
+
+export const randomInt = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
+// TODO include end param
+export const collideTail = (snake, x, y, includeEnd) => {
+  const { path, tail } = snake;
+  const shortPath = path.slice(-tail.length);
+  return shortPath.find((p) => p.x === x && p.y === y);
+};

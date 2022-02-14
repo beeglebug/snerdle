@@ -1,33 +1,19 @@
-import { calculateState } from "./util";
+import { INITIAL_SPEED, LETTERS, SIZE, SPEED_INCREMENT } from "./consts";
+import { createGrid, getElement } from "./grid";
+import { bindInput } from "./input";
+import { render } from "./render";
+import { spawn } from "./spawn";
+import { calculateState, collideTail } from "./util";
 import { all, selected } from "./words";
-
-const grid = document.querySelector(".grid");
-
-const size = 15;
-
-const elements = [];
-
-for (let y = 0; y < size; y++) {
-  const row = document.createElement("div");
-  row.classList.add("row");
-  grid.appendChild(row);
-  for (let x = 0; x < size; x++) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    row.appendChild(cell);
-    elements.push(cell);
-  }
-}
-
-const getElement = (x, y) => {
-  const i = y * size + x;
-  return elements[i];
-};
 
 const snake = {
   position: {
     x: 5,
     y: 5,
+  },
+  nextDirection: {
+    x: 1,
+    y: 0,
   },
   direction: {
     x: 1,
@@ -37,64 +23,56 @@ const snake = {
   path: [],
 };
 
-const answer = selected[Math.floor(Math.random() * selected.length)];
+const elements = createGrid();
+bindInput(snake);
 
-function render() {
-  const { tail, path, position, direction } = snake;
+const modalContainer = document.querySelector(".modal-container");
+const elAnswer = document.querySelector(".js-answer");
+const elStats = document.querySelector(".js-stats");
+const elTitle = document.querySelector(".js-title");
+const elRestart = document.querySelector(".js-restart");
+elRestart.addEventListener("click", restart);
 
-  // reset
-  document
-    .querySelectorAll(".unknown, .bad, .head, .correct, .present, .miss")
-    .forEach((el) => {
-      el.innerHTML = "";
-      el.classList.remove("unknown", "correct", "present", "miss", "bad");
-    });
-
-  const head = getElement(position.x, position.y);
-  head.classList.add("head");
-
-  const char = getCharForDirection(direction);
-
-  head.innerHTML = char;
-
-  for (let i = 0; i < tail.length; i++) {
-    const ix = path.length - 1 - i;
-    const { x, y } = path[ix];
-    const el = getElement(x, y);
-
-    const { letter, type } = tail[i];
-    el.classList.add(type);
-    el.innerHTML = letter;
-  }
+function lose() {
+  running = false;
+  showStats("Game Over");
 }
 
-function getCharForDirection({ x, y }) {
-  if (x === 1) return "▶";
-  if (x === -1) return "◀";
-  if (y === 1) return "▼";
-  if (y === -1) return "▲";
+function win() {
+  running = false;
+  showStats("Well Done");
 }
 
-render();
+function showStats(title) {
+  elTitle.innerHTML = title;
+  modalContainer.classList.remove("d-none");
+  elAnswer.innerHTML = answer;
 
-function die() {
-  clearInterval(loop);
+  const letters = snake.tail.length;
+  const guesses = Math.floor(snake.tail.length / 5);
+
+  elStats.innerHTML = `You ate ${letters} letter${
+    letters === 1 ? "" : "s"
+  } and had ${guesses} guess${guesses === 1 ? "" : "es"}.`;
 }
 
 function update() {
-  const { path, tail, direction, position } = snake;
+  const { path, tail, direction, nextDirection, position } = snake;
+
+  direction.x = nextDirection.x;
+  direction.y = nextDirection.y;
 
   const nextX = position.x + direction.x;
   const nextY = position.y + direction.y;
 
   const collideBounds =
-    nextX < 0 || nextX >= size || nextY < 0 || nextY >= size;
+    nextX < 0 || nextX >= SIZE || nextY < 0 || nextY >= SIZE;
 
-  if (collideBounds) return die();
+  if (collideBounds) return lose();
 
-  const collideSelf = collideTail(nextX, nextY, false);
+  const collideSelf = collideTail(snake, nextX, nextY, false);
 
-  if (collideSelf) return die();
+  if (collideSelf) return lose();
 
   const nextCell = getElement(nextX, nextY);
   const letter = nextCell.innerHTML;
@@ -104,8 +82,6 @@ function update() {
 
   path.push({ x: position.x, y: position.y });
 
-  // TODO truncate path
-
   position.x = nextX;
   position.y = nextY;
 }
@@ -114,6 +90,7 @@ function eat(letter, x, y) {
   const { tail } = snake;
   const type = "unknown";
   tail.unshift({ letter, x, y, type });
+  speed -= SPEED_INCREMENT;
 
   if (tail.length % 5 === 0) {
     const letters = tail.slice(0, 5);
@@ -122,13 +99,12 @@ function eat(letter, x, y) {
     guess(word);
   }
 
-  spawn(letter);
+  spawn(letter, snake);
 }
 
 function guess(word) {
-  console.log(word);
   if (word === answer) {
-    die();
+    win();
     return;
   }
 
@@ -151,80 +127,59 @@ function guess(word) {
       segment.type = "miss";
     }
   });
-
-  console.log(state);
 }
 
-// TODO a nextDirection which is not commited until next update
-function faceUp() {
-  if (snake.direction.y === 1) return;
-  snake.direction.x = 0;
-  snake.direction.y = -1;
+let answer;
+let running = false;
+let accumulator = 0;
+let lastTime;
+let speed;
+
+function tick(time = 0) {
+  if (running === false) return;
+  requestAnimationFrame(tick);
+  const delta = time - lastTime;
+
+  accumulator += delta;
+
+  while (accumulator > speed) {
+    accumulator -= speed;
+    update(snake);
+    render(snake);
+  }
+
+  lastTime = time;
 }
 
-function faceDown() {
-  if (snake.direction.y === -1) return;
-  snake.direction.x = 0;
-  snake.direction.y = 1;
-}
+function restart() {
+  elements.forEach((el) => (el.innerHTML = ""));
 
-function faceLeft() {
-  if (snake.direction.x === 1) return;
-  snake.direction.x = -1;
-  snake.direction.y = 0;
-}
+  for (let i = 0; i < 26; i++) {
+    const letter = LETTERS[i];
+    spawn(letter, snake);
+  }
 
-function faceRight() {
-  if (snake.direction.x === -1) return;
+  modalContainer.classList.add("d-none");
+
+  snake.position.x = 5;
+  snake.position.y = 5;
+
+  snake.nextDirection.x = 1;
+  snake.nextDirection.y = 0;
+
   snake.direction.x = 1;
   snake.direction.y = 0;
+
+  snake.tail = [];
+  snake.path = [];
+
+  answer = selected[Math.floor(Math.random() * selected.length)];
+
+  running = true;
+  speed = INITIAL_SPEED;
+  lastTime = performance.now();
+  accumulator = speed;
+  tick();
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.code === "ArrowUp") return faceUp();
-  if (e.code === "ArrowDown") return faceDown();
-  if (e.code === "ArrowLeft") return faceLeft();
-  if (e.code === "ArrowRight") return faceRight();
-});
-
-function tick() {
-  update();
-  render();
-}
-
-// TODO variable interval via accumulator loop
-const loop = setInterval(tick, 500);
-
-const letters = "abcdefghijklmnopqrstuvwxyz".split("");
-
-const randomInt = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-};
-
-function spawn(letter) {
-  const { position } = snake;
-
-  // TODO dont spawn in radius around head
-
-  // TODO probably super inneficient
-  while (true) {
-    const x = randomInt(0, size - 1);
-    const y = randomInt(0, size - 1);
-    if (collideTail(x, y) || (x === position.x && y === position.y)) continue;
-    const cell = getElement(x, y);
-    if (cell.innerHTML !== "") continue;
-    cell.innerHTML = letter;
-    break;
-  }
-}
-// TODO include end param
-const collideTail = (x, y, includeEnd) => {
-  const { path, tail } = snake;
-  const shortPath = path.slice(-tail.length);
-  return shortPath.find((p) => p.x === x && p.y === y);
-};
-
-for (let i = 0; i < 26; i++) {
-  const letter = letters[i];
-  spawn(letter);
-}
+restart();
