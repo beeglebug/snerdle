@@ -7,14 +7,8 @@ import { calculateState, collideTail } from "./util";
 import { all, selected } from "./words";
 
 const snake = {
-  position: {
-    x: 5,
-    y: 5,
-  },
-  direction: {
-    x: 1,
-    y: 0,
-  },
+  position: { x: 0, y: 0 },
+  direction: { x: 1, y: 0 },
   tail: [],
   path: [],
 };

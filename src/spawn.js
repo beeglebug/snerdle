@@ -3,7 +3,7 @@ import { getElement } from "./grid";
 import { collideTail, randomInt } from "./util";
 
 export function spawn(letter, snake) {
-  const { position, direction } = snake;
+  const { position } = snake;
   let escape = 0;
   // TODO probably super inneficient
   while (true) {
