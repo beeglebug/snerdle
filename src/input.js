@@ -1,7 +1,6 @@
 function faceUp(snake) {
   const { direction, path, position } = snake;
   const end = path[path.length - 1];
-  console.log("up", end, position);
   // would the next move make us hit the start of our own tail?
   if (end.x === position.x && end.y === position.y - 1) return;
   direction.x = 0;
@@ -11,7 +10,6 @@ function faceUp(snake) {
 function faceDown(snake) {
   const { direction, path, position } = snake;
   const end = path[path.length - 1];
-  console.log("down", end, position);
   // would this move make us hit the start of our own tail?
   if (end.x === position.x && end.y === position.y + 1) return;
   direction.x = 0;
@@ -21,7 +19,6 @@ function faceDown(snake) {
 function faceLeft(snake) {
   const { direction, path, position } = snake;
   const end = path[path.length - 1];
-  console.log("left", end, position);
   // would this move make us hit the start of our own tail?
   if (end.x === position.x - 1 && end.y === position.y) return;
   direction.x = -1;
@@ -31,7 +28,6 @@ function faceLeft(snake) {
 function faceRight(snake) {
   const { direction, path, position } = snake;
   const end = path[path.length - 1];
-  console.log("right", end, position);
   // would this move make us hit the start of our own tail?
   if (end.x === position.x + 1 && end.y === position.y) return;
   direction.x = 1;

@@ -66,14 +66,12 @@ function update() {
     nextX < 0 || nextX >= SIZE || nextY < 0 || nextY >= SIZE;
 
   if (collideBounds) {
-    console.log("collided bounds");
     return lose();
   }
 
   const collideSelf = collideTail(snake, nextX, nextY);
 
   if (collideSelf) {
-    console.log("collided self", collideSelf);
     return lose();
   }
 
