@@ -11,10 +11,6 @@ const snake = {
     x: 5,
     y: 5,
   },
-  nextDirection: {
-    x: 1,
-    y: 0,
-  },
   direction: {
     x: 1,
     y: 0,
@@ -22,6 +18,8 @@ const snake = {
   tail: [],
   path: [],
 };
+
+window.snake = snake;
 
 const elements = createGrid();
 bindInput(snake);
@@ -59,10 +57,7 @@ function showStats(title) {
 }
 
 function update() {
-  const { path, tail, direction, nextDirection, position } = snake;
-
-  direction.x = nextDirection.x;
-  direction.y = nextDirection.y;
+  const { path, tail, direction, position } = snake;
 
   const nextX = position.x + direction.x;
   const nextY = position.y + direction.y;
@@ -70,11 +65,17 @@ function update() {
   const collideBounds =
     nextX < 0 || nextX >= SIZE || nextY < 0 || nextY >= SIZE;
 
-  if (collideBounds) return lose();
+  if (collideBounds) {
+    console.log("collided bounds");
+    return lose();
+  }
 
-  const collideSelf = collideTail(snake, nextX, nextY, false);
+  const collideSelf = collideTail(snake, nextX, nextY);
 
-  if (collideSelf) return lose();
+  if (collideSelf) {
+    console.log("collided self", collideSelf);
+    return lose();
+  }
 
   const nextCell = getElement(nextX, nextY);
   const letter = nextCell.innerHTML;
@@ -170,9 +171,6 @@ function restart(first = false) {
 
   snake.position.x = 5;
   snake.position.y = 5;
-
-  snake.nextDirection.x = 1;
-  snake.nextDirection.y = 0;
 
   snake.direction.x = 1;
   snake.direction.y = 0;

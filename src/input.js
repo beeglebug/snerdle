@@ -1,26 +1,41 @@
-// TODO a nextDirection which is not commited until next update
 function faceUp(snake) {
-  if (snake.direction.y === 1) return;
-  snake.nextDirection.x = 0;
-  snake.nextDirection.y = -1;
+  const { direction, path, position } = snake;
+  const end = path[path.length - 1];
+  console.log("up", end, position);
+  // would the next move make us hit the start of our own tail?
+  if (end.x === position.x && end.y === position.y - 1) return;
+  direction.x = 0;
+  direction.y = -1;
 }
 
 function faceDown(snake) {
-  if (snake.direction.y === -1) return;
-  snake.nextDirection.x = 0;
-  snake.nextDirection.y = 1;
+  const { direction, path, position } = snake;
+  const end = path[path.length - 1];
+  console.log("down", end, position);
+  // would this move make us hit the start of our own tail?
+  if (end.x === position.x && end.y === position.y + 1) return;
+  direction.x = 0;
+  direction.y = 1;
 }
 
 function faceLeft(snake) {
-  if (snake.direction.x === 1) return;
-  snake.nextDirection.x = -1;
-  snake.nextDirection.y = 0;
+  const { direction, path, position } = snake;
+  const end = path[path.length - 1];
+  console.log("left", end, position);
+  // would this move make us hit the start of our own tail?
+  if (end.x === position.x - 1 && end.y === position.y) return;
+  direction.x = -1;
+  direction.y = 0;
 }
 
 function faceRight(snake) {
-  if (snake.direction.x === -1) return;
-  snake.nextDirection.x = 1;
-  snake.nextDirection.y = 0;
+  const { direction, path, position } = snake;
+  const end = path[path.length - 1];
+  console.log("right", end, position);
+  // would this move make us hit the start of our own tail?
+  if (end.x === position.x + 1 && end.y === position.y) return;
+  direction.x = 1;
+  direction.y = 0;
 }
 
 export function bindInput(snake) {

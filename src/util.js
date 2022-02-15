@@ -27,9 +27,9 @@ export const randomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-// TODO include end param
-export const collideTail = (snake, x, y, includeEnd) => {
+export const collideTail = (snake, x, y) => {
   const { path, tail } = snake;
+  if (tail.length === 0) return null;
   const shortPath = path.slice(-tail.length);
   return shortPath.find((p) => p.x === x && p.y === y);
 };
